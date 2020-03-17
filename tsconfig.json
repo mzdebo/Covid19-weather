@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"module": "esnext",
+		"target": "es5",
+		"declaration": true,
+		"jsx": "preserve",
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"moduleResolution": "node",
+		"outDir": "./dist/src",
+		"sourceMap": true,
+		"typeRoots": [
+			"node_modules/@types/",
+		  	"./types"
+		],
+		"lib": ["es2015", "dom"]
+	},
+	"exclude": [
+		"node_modules",
+	  	"types",
+		"tests",
+		"__mocks__",
+		"webpack*.js"
+	]
+}

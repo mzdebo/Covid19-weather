@@ -69,11 +69,11 @@ const colorForValue = (type: string, val: number): string => {
 const diameterForValue = (val: number): number => {
 	let diameter = 28;
 	if (val >= 10000) {
-		diameter = 80 + Math.floor(val / 2000);
+		diameter = 80 + Math.round(val / 2000);
 	} else if (val >= 1000) {
-		diameter = 35 + Math.floor(val / 250);
+		diameter = 45 + Math.round(val / 250);
 	} else if (val >= 100) {
-		diameter += Math.floor(val / 100) + 3;
+		diameter += Math.round(val / 100) + 3;
 	}
 	return diameter;
 };

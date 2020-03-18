@@ -1,5 +1,5 @@
 import MapSourceModule from '@aerisweather/javascript-sdk/dist/modules/MapSourceModule';
-import {get, formatDate, isArray} from '@aerisweather/javascript-sdk/dist/utils';
+import {get, formatDate, isArray, isNumber} from '@aerisweather/javascript-sdk/dist/utils';
 import {isLight} from '@aerisweather/javascript-sdk/dist/utils/color';
 import {hexColorLinterp} from "hex-color-linterp";
 import {csvToGeoJson} from "./csv2geojson";
@@ -37,7 +37,10 @@ const propColorMapping: {
 };
 
 const numberWithCommas = (x: number) => {
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	if (isNumber(x)) {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	return x;
 };
 
 const progress = (start: number, end: number, val: number): number => {
@@ -50,8 +53,12 @@ const colorForValue = (type: string, val: number): string => {
 
 	let useColor: string;
 	if (val >= colorMapping.minValue) {
-		const pos = progress(colorMapping.minValue, colorMapping.maxValue, val);
-		useColor = hexColorLinterp(pos, colorMapping.minColor, colorMapping.maxColor);
+		if (colorMapping.minColor === colorMapping.maxColor) {
+			useColor = colorMapping.minColor;
+		} else {
+			const pos = progress(colorMapping.minValue, colorMapping.maxValue, val);
+			useColor = hexColorLinterp(pos, colorMapping.minColor, colorMapping.maxColor);
+		}
 	} else {
 		useColor = colorMapping.default;
 	}
@@ -93,6 +100,7 @@ class Covid19Module extends MapSourceModule {
 		d.setDate(d.getDate() - dateOffset);
 		const dataDate = formatDate(d, 'MM-dd-yyyy');
 
+		// noinspection JSUnusedGlobalSymbols
 		return {
 			type: 'geojson',
 			data: {
@@ -192,6 +200,7 @@ class Covid19Module extends MapSourceModule {
 	}
 
 	infopanel(): any {
+		// noinspection JSUnusedGlobalSymbols
 		return {
 			views: [
 				{
@@ -217,17 +226,17 @@ class Covid19Module extends MapSourceModule {
 
                                             <div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Confirmed Cases:</div>
-                                                <div class="awxjs__ui-expand value">${data.Confirmed}</div>
+                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Confirmed)}</div>
                                             </div>
 
                                             <div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Deaths:</div>
-                                                <div class="awxjs__ui-expand value">${data.Deaths}</div>
+                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Deaths)}</div>
                                             </div>
 
                                             <div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Recovered:</div>
-                                                <div class="awxjs__ui-expand value">${data.Recovered}</div>
+                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Recovered)}</div>
                                             </div>
 
                                         </div>
@@ -249,7 +258,6 @@ class Covid19Module extends MapSourceModule {
 					value = value[0].value;
 				}
 				this.dataProp = value;
-				console.log(this.dataProp);
 			}
 		});
 	}
@@ -265,7 +273,7 @@ class Covid19Module extends MapSourceModule {
 	}
 
 	onMarkerClick(marker: any, data: any) {
-		const country = data.Country_Region;
+		const country:string = data.Country_Region;
 		const state = data.Province_State;
 		let title = `COVID-19 ${country}`;
 		if (state) title += ' - ' + state;

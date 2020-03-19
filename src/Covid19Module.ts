@@ -100,11 +100,13 @@ class Covid19Module extends MapSourceModule {
 		d.setDate(d.getDate() - dateOffset);
 		const dataDate = formatDate(d, 'MM-dd-yyyy');
 
+		const dataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${dataDate}.csv`;
+
 		// noinspection JSUnusedGlobalSymbols
 		return {
 			type: 'geojson',
 			data: {
-				url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/' + dataDate + '.csv',
+				url: dataUrl,
 				formatter: (data: string) => {
 					if (data) {
 						// noinspection JSUnusedGlobalSymbols
@@ -126,6 +128,7 @@ class Covid19Module extends MapSourceModule {
 			style: {
 				marker: (data: any) => {
 					const covidDataElem = parseInt(get(data, this.dataProp)) || 0;
+
 					if (covidDataElem !== 0) {
 						const circleDiameter: number = diameterForValue(covidDataElem);
 						const circleColor: string = colorForValue(this.dataProp, covidDataElem);
@@ -255,7 +258,7 @@ class Covid19Module extends MapSourceModule {
 			let {id, value} = e.data || {};
 			if (id === this.id) {
 				if (isArray(value)) {
-					value = value[0].value;
+					value = value[0].filter;
 				}
 				this.dataProp = value;
 			}

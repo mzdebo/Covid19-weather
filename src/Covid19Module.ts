@@ -95,7 +95,7 @@ class Covid19Module extends MapSourceModule {
 
 		// determine the date for the data set
 		// it updates around midnight
-		const d: Date = new Date( new Date().getTime() - 180000);
+		const d: Date = new Date(new Date().getTime() - 180000);
 		const dataDate = formatDate(d, 'MM-dd-yyyy');
 
 		const dataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${dataDate}.csv`;
@@ -111,7 +111,10 @@ class Covid19Module extends MapSourceModule {
 						return csvToGeoJson(data, {
 							header: true,
 							transformHeader: (header: string) => {
-								return header.replace(/\W+/, '_');
+								return header.replace(/\W+/, '_')
+									.replace(/_+$/, '')
+									.replace(/^Lat\w*$/i, 'Latitude')
+									.replace(/^Long\w*$/i, 'Longitude');
 							},
 							fields: {
 								latitude: 'Latitude',
@@ -208,7 +211,9 @@ class Covid19Module extends MapSourceModule {
 					renderer: (data: any) => {
 						if (!data) return;
 
-						return `
+						const admin2 = get(data, 'Admin2');
+
+						let info = `
                                         <div class="covid19">
                                             <div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Last Updated:</div>
@@ -224,8 +229,14 @@ class Covid19Module extends MapSourceModule {
                                                 <div class="awxjs__ui-expand label">State/Province:</div>
                                                 <div class="awxjs__ui-expand value">${data.Province_State}</div>
                                             </div>
+                                            `;
+						if (admin2)
+							info += `<div class="awxjs__ui-row">
+                                                <div class="awxjs__ui-expand label">County / Parish:</div>
+                                                <div class="awxjs__ui-expand value">${admin2}</div>
+                                            </div>`
 
-                                            <div class="awxjs__ui-row">
+						info += `<div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Confirmed Cases:</div>
                                                 <div class="awxjs__ui-expand value">${numberWithCommas(data.Confirmed)}</div>
                                             </div>
@@ -242,6 +253,7 @@ class Covid19Module extends MapSourceModule {
 
                                         </div>
                                         `;
+						return info;
 					}
 				}
 			]
@@ -274,10 +286,15 @@ class Covid19Module extends MapSourceModule {
 	}
 
 	onMarkerClick(marker: any, data: any) {
-		const country:string = data.Country_Region;
+		const country: string = data.Country_Region;
+		const admin2 = get(data, 'Admin2');
 		const state = data.Province_State;
 		let title = `COVID-19 ${country}`;
-		if (state) title += ' - ' + state;
+		if (admin2) title += ' - ' + admin2;
+		if (state) {
+			title += (admin2) ? ', ' : ' - ';
+			title += state;
+		}
 		this.showInfoPanel(title, data);
 	}
 

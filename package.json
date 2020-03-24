@@ -1,7 +1,7 @@
 {
   "name": "awxjs-covid19-module",
   "moduleName": "Covid19Module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "author": "Lee Huffman",
   "homepage": "https://www.aerisweather.com",

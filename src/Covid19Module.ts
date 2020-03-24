@@ -95,9 +95,7 @@ class Covid19Module extends MapSourceModule {
 
 		// determine the date for the data set
 		// it updates around midnight
-		const d: Date = new Date();
-		const dateOffset: number = (d.getUTCHours() > 2) ? 1 : 2;
-		d.setDate(d.getDate() - dateOffset);
+		const d: Date = new Date( new Date().getTime() - 180000);
 		const dataDate = formatDate(d, 'MM-dd-yyyy');
 
 		const dataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${dataDate}.csv`;

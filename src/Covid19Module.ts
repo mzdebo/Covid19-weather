@@ -95,8 +95,10 @@ class Covid19Module extends MapSourceModule {
 
 		// determine the date for the data set
 		// it updates around midnight
-		const d: Date = new Date(new Date().getTime() - 180000);
-		const dataDate = formatDate(d, 'MM-dd-yyyy');
+		const d: Date = new Date();
+		d.setDate(d.getUTCDate()-1);
+		const dateOpts: any = { year: 'numeric', month: '2-digit', day: '2-digit' };
+		const dataDate = new Intl.DateTimeFormat('en-US', dateOpts).format(d).replace(/\//g, '-');
 
 		const dataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${dataDate}.csv`;
 
@@ -111,7 +113,7 @@ class Covid19Module extends MapSourceModule {
 						return csvToGeoJson(data, {
 							header: true,
 							transformHeader: (header: string) => {
-								return header.replace(/\W+/, '_')
+								return header.replace(/\W+/g, '_')
 									.replace(/_+$/, '')
 									.replace(/^Lat\w*$/i, 'Latitude')
 									.replace(/^Long\w*$/i, 'Longitude');
@@ -234,7 +236,7 @@ class Covid19Module extends MapSourceModule {
 							info += `<div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">County / Parish:</div>
                                                 <div class="awxjs__ui-expand value">${admin2}</div>
-                                            </div>`
+                                            </div>`;
 
 						info += `<div class="awxjs__ui-row">
                                                 <div class="awxjs__ui-expand label">Confirmed Cases:</div>
